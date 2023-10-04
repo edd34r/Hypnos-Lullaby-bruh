@@ -21,6 +21,9 @@ jobs:
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r21e
+          
+      - name: Set Android NDK Root
+        run: echo "::set-env name=ANDROID_NDK_ROOT::${{ steps.setup-ndk.outputs.ndk-path }}"
 
       - name: Setup Java JDK
         uses: actions/setup-java@v1
@@ -35,25 +38,7 @@ jobs:
         with:
           haxe-version: 4.2.5
 
-      - name: Install Haxelib
-        run: |
-          haxelib setup ~/haxelib
-          haxelib install hxcpp > /dev/null
-          haxelib install lime 7.9.0
-          # Resto de las instalaciones
-          haxelib list
-
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-
-      - name: Setup Lime
-        run: |
-          haxelib run lime setup -alias -y
-          haxelib run lime config ANDROID_SDK $ANDROID_HOME
-          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
-          # Resto de la configuración...
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      # Resto de tu configuración...
 
       - name: Compile
         run: haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}"
