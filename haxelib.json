@@ -1,0 +1,9 @@
+{
+  "name": "Hypnos-Lullaby-bruh",
+  "version": "1.0.0",
+  "classPath": "",
+  "dependencies": {
+    "lime": "7.9.0"
+    // Agrega aquí otras dependencias si las tienes
+  }
+}
