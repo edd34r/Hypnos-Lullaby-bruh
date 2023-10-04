@@ -1,2 +1,50 @@
-- name: Verificar ubicación del NDK
-  run: echo $ANDROID_NDK_HOME
+name: Build Android
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  buildAndroid:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Android NDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip
+          unzip -q android-ndk-r21e-linux-x86_64.zip -d $HOME
+          echo "ANDROID_NDK_HOME=$HOME/android-ndk-r21e" >> $GITHUB_ENV
+          
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1.1.5
+        with:
+          haxe-version: 4.2.5
+
+      # Resto de tu configuración...
+
+      - name: Compile
+        run: haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}"
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Android Build
+          path: export/release/android/bin/app/build/outputs/apk/debug
